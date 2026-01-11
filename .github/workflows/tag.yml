@@ -32,7 +32,8 @@ jobs:
           if [ -z "$LATEST_TAG" ]; then
             BASE_VERSION="v0.1.0"
           else
-            BASE_VERSION="$LATEST_TAG"
+            # Strip any existing suffix (like -timestamp-hash) to get the clean base version (e.g. v1.0.0)
+            BASE_VERSION=$(echo "$LATEST_TAG" | sed 's/-.*//')
           fi
 
           # Create pseudo-version tag: v1.0.0-20260111130755-abc123456789
