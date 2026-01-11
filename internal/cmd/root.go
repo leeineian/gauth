@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
+	"runtime/debug"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -14,7 +16,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = "gauth v1.26.0 (Go 1.25.5)"
+const hardcodedVersion = "dev" // Fallback for local builds
+
+func getVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		// If installed via 'go install', Main.Version will be the tag version (e.g., v1.26.0)
+		// If built locally in a module, it might be (devel)
+		v := info.Main.Version
+		if v == "(devel)" {
+			v = hardcodedVersion
+		}
+		return fmt.Sprintf("gauth %s (%s)", v, info.GoVersion)
+	}
+	return fmt.Sprintf("gauth %s (%s)", hardcodedVersion, runtime.Version())
+}
 
 var (
 	rootCmd = &cobra.Command{
@@ -56,7 +71,7 @@ func init() {
 
 	rootCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
 		if versionFlag {
-			fmt.Println(version)
+			fmt.Println(getVersion())
 			os.Exit(0)
 		}
 		if passwdFlag {
