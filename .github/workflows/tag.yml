@@ -19,8 +19,8 @@ jobs:
 
       - name: Generate pseudo-version tag
         run: |
-          # Get the short commit hash
-          COMMIT_SHORT=$(git rev-parse --short HEAD)
+          # Get the 12-character commit hash (required by Go pseudo-version format)
+          COMMIT_HASH=$(git rev-parse HEAD | cut -c1-12)
 
           # Get the current timestamp in UTC (format: YYYYMMDDHHmmss)
           TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
@@ -33,8 +33,8 @@ jobs:
             BASE_VERSION="$LATEST_TAG"
           fi
 
-          # Create pseudo-version tag: v1.0.0-20260111130755-abc1234
-          PSEUDO_TAG="${BASE_VERSION}-${TIMESTAMP}-${COMMIT_SHORT}"
+          # Create pseudo-version tag: v1.0.0-20260111130755-abc123456789
+          PSEUDO_TAG="${BASE_VERSION}-${TIMESTAMP}-${COMMIT_HASH}"
 
           echo "Creating tag: $PSEUDO_TAG"
 
