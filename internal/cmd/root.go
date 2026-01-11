@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = "gauth v1.0.0 (Go 1.25.5)"
+const version = "gauth v1.0.1 (Go 1.25.5)"
 
 var (
 	rootCmd = &cobra.Command{
