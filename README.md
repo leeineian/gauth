@@ -14,7 +14,7 @@ Fast, no-nonsense 2FA for your terminal, written in Go.
 
 ## Installation
 ```bash
-go install github.com/leeineian/gauth@latest
+go install github.com/leeineian/gauth@main
 ```
 
 Or build from source:
