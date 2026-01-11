@@ -43,7 +43,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          git tag $VERSION
+          git tag -a $VERSION -m "Release $VERSION"
           git push origin $VERSION
           
           echo "tag_name=$VERSION" >> $GITHUB_OUTPUT
