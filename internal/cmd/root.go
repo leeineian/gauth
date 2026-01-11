@@ -14,29 +14,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const version = "gauth v1.0.0 (Go 1.25.5)"
+
 var (
 	rootCmd = &cobra.Command{
-		Use:   "gauth",
-		Short: "gauth is a simple CLI for generating 2FA codes",
-		Example: `  gauth             # Show all codes
-  gauth entry add   # Add a new account
-  gauth entry list  # Manage existing accounts`,
+		Use:           "gauth",
+		Short:         "gauth is a fast, no-nonsense 2FA for your terminal",
 		RunE:          runRoot,
 		SilenceUsage:  true,
 		SilenceErrors: true,
-	}
-
-	entryCmd = &cobra.Command{
-		Use:   "entry",
-		Short: "Manage account entries",
-	}
-
-	versionCmd = &cobra.Command{
-		Use:   "version",
-		Short: "Print version information",
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("gauth v1.0.0 (Go 1.25.5)")
-		},
 	}
 
 	watchFlag bool
@@ -55,17 +41,36 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(entryCmd)
-	rootCmd.AddCommand(importCmd)
-	rootCmd.AddCommand(exportCmd)
-	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(passwdCmd)
-
-	entryCmd.AddCommand(entryListCmd)
-	entryCmd.AddCommand(entryAddCmd)
-	entryCmd.AddCommand(entryDeleteCmd)
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	rootCmd.Flags().BoolVarP(&watchFlag, "watch", "w", false, "watch codes update in real-time")
+
+	var versionFlag, passwdFlag, exportFlag, importFlag, accountFlag bool
+	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "print version information")
+	rootCmd.Flags().BoolVarP(&passwdFlag, "passwd", "p", false, "set or change the master password")
+	rootCmd.Flags().BoolVarP(&exportFlag, "export", "e", false, "export accounts to andOTP format")
+	rootCmd.Flags().BoolVarP(&importFlag, "import", "i", false, "import accounts from andOTP backups")
+	rootCmd.Flags().BoolVarP(&accountFlag, "account", "a", false, "list all accounts")
+
+	rootCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		if versionFlag {
+			fmt.Println(version)
+			os.Exit(0)
+		}
+		if passwdFlag {
+			return passwdCmd.RunE(cmd, args)
+		}
+		if exportFlag {
+			return exportCmd.RunE(cmd, args)
+		}
+		if importFlag {
+			return importCmd.RunE(cmd, args)
+		}
+		if accountFlag {
+			return entryListCmd.RunE(cmd, args)
+		}
+		return nil
+	}
 }
 
 func runRoot(cmd *cobra.Command, args []string) error {
