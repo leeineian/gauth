@@ -22,8 +22,9 @@ jobs:
           # Get the 12-character commit hash (required by Go pseudo-version format)
           COMMIT_HASH=$(git rev-parse HEAD | cut -c1-12)
 
-          # Get the current timestamp in UTC (format: YYYYMMDDHHmmss)
-          TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
+          # Get the commit's timestamp in UTC (format: YYYYMMDDHHmmss)
+          # Go requires the timestamp to match the commit's actual time
+          TIMESTAMP=$(TZ=UTC git show -s --format=%cd --date=format-local:%Y%m%d%H%M%S HEAD)
 
           # Get the latest semantic version tag, default to v1.0.0 if none exists
           LATEST_TAG=$(git tag -l "v[0-9]*.[0-9]*.[0-9]*" | sort -V | tail -n 1)
