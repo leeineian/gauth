@@ -209,6 +209,17 @@ func PromptNewPassword() (string, error) {
 	return p1, err
 }
 
+func PromptInput(title string, description string) (string, error) {
+	var val string
+	err := huh.NewInput().
+		Title(title).
+		Description(description).
+		Value(&val).
+		Validate(required("value")).
+		Run()
+	return val, err
+}
+
 func required(name string) func(string) error {
 	return func(s string) error {
 		if strings.TrimSpace(s) == "" {

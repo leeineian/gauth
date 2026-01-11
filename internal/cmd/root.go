@@ -75,22 +75,22 @@ func init() {
 			os.Exit(0)
 		}
 		if passwdFlag {
-			return passwdCmd.RunE(cmd, args)
+			return passwdCmd.RunE(passwdCmd, args)
 		}
 		if exportFlag {
-			return exportCmd.RunE(cmd, args)
+			return exportCmd.RunE(exportCmd, args)
 		}
 		if importFlag {
-			return importCmd.RunE(cmd, args)
+			return importCmd.RunE(importCmd, args)
 		}
 		if accountFlag {
-			return entryListCmd.RunE(cmd, args)
+			return entryListCmd.RunE(entryListCmd, args)
 		}
 		if addFlag {
-			return entryAddCmd.RunE(cmd, args)
+			return entryAddCmd.RunE(entryAddCmd, args)
 		}
 		if deleteFlag {
-			return entryDeleteCmd.RunE(cmd, args)
+			return entryDeleteCmd.RunE(entryDeleteCmd, args)
 		}
 		return nil
 	}

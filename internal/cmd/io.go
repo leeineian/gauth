@@ -16,6 +16,13 @@ var importCmd = &cobra.Command{
 	Short: "Import accounts from andOTP backups",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath, _ := cmd.Flags().GetString("file")
+		if filePath == "" {
+			f, err := ui.PromptInput("Enter backup file path", "Path to the .json backup file")
+			if err != nil {
+				return err
+			}
+			filePath = f
+		}
 
 		data, err := os.ReadFile(filePath)
 		if err != nil {
@@ -88,6 +95,9 @@ var exportCmd = &cobra.Command{
 	Short: "Export accounts to andOTP format",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath, _ := cmd.Flags().GetString("file")
+		if filePath == "" {
+			filePath = "gauth_backup.json"
+		}
 
 		store, err := storage.NewStorage()
 		if err != nil {
