@@ -11,13 +11,13 @@ Fast, no-nonsense 2FA for your terminal, written in Go.
 
 ## Installation
 ```bash
-go install github.com/leeineian/gauth/cmd/gauth@latest
+go install github.com/leeineian/gauth@latest
 ```
 
 Or build from source:
 ```bash
 git clone https://github.com/leeineian/gauth.git
-cd gauth && go build -o gauth ./cmd/gauth
+cd gauth && go build -o gauth .
 ```
 
 ### Docker
@@ -57,7 +57,7 @@ docker run -it -v ~/.gauth:/root/.gauth gauth
 Once a password is set, your `gauth.json` is encrypted using AES-256-GCM.
 
 ## Requirements
-- Go 1.25.5+
+- Go 1.25.5 or higher
 
 ## License
 AGPL-3.0

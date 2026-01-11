@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -20,7 +21,9 @@ var (
 		Example: `  gauth             # Show all codes
   gauth entry add   # Add a new account
   gauth entry list  # Manage existing accounts`,
-		RunE: runRoot,
+		RunE:          runRoot,
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 
 	entryCmd = &cobra.Command{
@@ -40,7 +43,15 @@ var (
 )
 
 func Execute() {
-	cobra.CheckErr(rootCmd.Execute())
+	if err := rootCmd.Execute(); err != nil {
+		errorStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("9")).
+			Bold(true).
+			MarginTop(1)
+
+		fmt.Fprintln(os.Stderr, errorStyle.Render("Error:"), err)
+		os.Exit(1)
+	}
 }
 
 func init() {
@@ -82,7 +93,6 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	isEnc, _ := store.IsEncrypted()
 	if !isEnc {
 		fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("3")).Render("! Your database is currently unencrypted. Run 'gauth passwd' to set a master password."))
-		fmt.Println()
 	}
 
 	if watchFlag {
