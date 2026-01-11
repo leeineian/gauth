@@ -26,10 +26,11 @@ jobs:
           # Go requires the timestamp to match the commit's actual time
           TIMESTAMP=$(TZ=UTC git show -s --format=%cd --date=format-local:%Y%m%d%H%M%S HEAD)
 
-          # Get the latest semantic version tag, default to v1.0.0 if none exists
+          # Get the latest semantic version tag, default to v0.1.0 if none exists
+          # Go requires v0 for the first version without a preceding tag
           LATEST_TAG=$(git tag -l "v[0-9]*.[0-9]*.[0-9]*" | sort -V | tail -n 1)
           if [ -z "$LATEST_TAG" ]; then
-            BASE_VERSION="v1.0.0"
+            BASE_VERSION="v0.1.0"
           else
             BASE_VERSION="$LATEST_TAG"
           fi
