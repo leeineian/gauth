@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to fetch all tags for version calculation
 
       - uses: actions/setup-go@v6
         with:
@@ -22,31 +24,48 @@ jobs:
       - name: Run Tests
         run: go test -v ./...
 
-      # 2. Generate Tag and Push
-      - name: Create Date Tag
+      # 2. Generate CalVer Tag (v1.YY.PATCH) and Push
+      - name: Create CalVer Tag
         id: tag
         run: |
-          # 1. Get Base Version
-          BASE_VERSION="v1.26.0"
-
-          # 2. Get Timestamp (YYYYMMDD) as requested
-          TIMESTAMP=$(date +%Y%m%d)
-
-          # 3. Get Commit Hash (12 chars)
-          COMMIT_HASH=$(git rev-parse --short=12 HEAD)
-
-          # 4. Construct Final Tag
-          VERSION="${BASE_VERSION}-${TIMESTAMP}-${COMMIT_HASH}"
+          # 1. Define Version Strategy
+          # Strategy: v1.{YY}.{PATCH}
+          # Example: v1.26.0, v1.26.1, v1.26.2 ...
+          # Next Year: v1.27.0
           
-          echo "Creating tag: $VERSION"
+          MAJOR_PREFIX="v1"
+          YEAR=$(date +%y)
+          VER_PREFIX="${MAJOR_PREFIX}.${YEAR}"
           
+          echo "Target Prefix: $VER_PREFIX"
+
+          # 2. Find Highest Existing Tag matching v1.YY.* (STABLE only)
+          # filter for tags that strictly match v1.YY.NUMBER (no hyphens)
+          LAST_TAG=$(git tag -l "${VER_PREFIX}.*" | grep -E "^${VER_PREFIX}\.[0-9]+$" | sort -V | tail -n1)
+
+          if [ -z "$LAST_TAG" ]; then
+            # No tags found for this year (or start of 2026/2027), start at .0
+            NEW_TAG="${VER_PREFIX}.0"
+            echo "No existing tags found for ${VER_PREFIX}. Starting at ${NEW_TAG}"
+          else
+            # Increment the patch version
+            LAST_PATCH=${LAST_TAG##*.}
+            NEW_PATCH=$((LAST_PATCH + 1))
+            NEW_TAG="${VER_PREFIX}.${NEW_PATCH}"
+            echo "Found existing tag ${LAST_TAG}. Incrementing to ${NEW_TAG}"
+          fi
+          
+          echo "Final Version: $NEW_TAG"
+          
+          # 3. Configure Git and Push
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          git tag -a $VERSION -m "Release $VERSION"
-          git push origin $VERSION
+          git tag -a $NEW_TAG -m "Release $NEW_TAG"
+          git push origin $NEW_TAG
           
-          echo "tag_name=$VERSION" >> $GITHUB_OUTPUT
+          # 4. Save to Output
+          echo "tag_name=$NEW_TAG" >> $GITHUB_OUTPUT
 
       # 3. Refresh Proxy
       - name: Refresh pkg.go.dev
