@@ -1,0 +1,60 @@
+name: Auto Tag on Push
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate pseudo-version tag
+        run: |
+          # Get the short commit hash
+          COMMIT_SHORT=$(git rev-parse --short HEAD)
+
+          # Get the current timestamp in UTC (format: YYYYMMDDHHmmss)
+          TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
+
+          # Get the latest semantic version tag, default to v1.0.0 if none exists
+          LATEST_TAG=$(git tag -l "v[0-9]*.[0-9]*.[0-9]*" | sort -V | tail -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            BASE_VERSION="v1.0.0"
+          else
+            BASE_VERSION="$LATEST_TAG"
+          fi
+
+          # Create pseudo-version tag: v1.0.0-20260111130755-abc1234
+          PSEUDO_TAG="${BASE_VERSION}-${TIMESTAMP}-${COMMIT_SHORT}"
+
+          echo "Creating tag: $PSEUDO_TAG"
+
+          # Create and push the tag
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$PSEUDO_TAG"
+          git push origin "$PSEUDO_TAG"
+
+          echo "✅ Successfully created and pushed tag: $PSEUDO_TAG"
+
+      - name: Trigger pkg.go.dev update
+        run: |
+          # Get the latest tag we just created
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          MODULE_PATH=$(go list -m)
+
+          echo "Notifying pkg.go.dev about new version: $LATEST_TAG"
+
+          # Request pkg.go.dev to fetch the new version
+          curl -f "https://proxy.golang.org/${MODULE_PATH}/@v/${LATEST_TAG}.info" || true
+
+          echo "✅ pkg.go.dev has been notified"
