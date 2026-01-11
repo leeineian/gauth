@@ -45,12 +45,14 @@ func init() {
 
 	rootCmd.Flags().BoolVarP(&watchFlag, "watch", "w", false, "watch codes update in real-time")
 
-	var versionFlag, passwdFlag, exportFlag, importFlag, accountFlag bool
+	var versionFlag, passwdFlag, exportFlag, importFlag, accountFlag, addFlag, deleteFlag bool
 	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "print version information")
 	rootCmd.Flags().BoolVarP(&passwdFlag, "passwd", "p", false, "set or change the master password")
 	rootCmd.Flags().BoolVarP(&exportFlag, "export", "e", false, "export accounts to andOTP format")
 	rootCmd.Flags().BoolVarP(&importFlag, "import", "i", false, "import accounts from andOTP backups")
-	rootCmd.Flags().BoolVarP(&accountFlag, "account", "a", false, "list all accounts")
+	rootCmd.Flags().BoolVarP(&accountFlag, "list", "l", false, "list all accounts")
+	rootCmd.Flags().BoolVarP(&addFlag, "add", "a", false, "add a new account")
+	rootCmd.Flags().BoolVarP(&deleteFlag, "delete", "d", false, "delete an account")
 
 	rootCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
 		if versionFlag {
@@ -68,6 +70,12 @@ func init() {
 		}
 		if accountFlag {
 			return entryListCmd.RunE(cmd, args)
+		}
+		if addFlag {
+			return entryAddCmd.RunE(cmd, args)
+		}
+		if deleteFlag {
+			return entryDeleteCmd.RunE(cmd, args)
 		}
 		return nil
 	}
@@ -90,14 +98,14 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(accounts) == 0 {
-		fmt.Println("No accounts found. Use 'gauth entry add' to add one.")
+		fmt.Println("No accounts found. Use 'gauth -a' to add one.")
 		return nil
 	}
 
 	// Proactively suggest encryption if it's currently plain text
 	isEnc, _ := store.IsEncrypted()
 	if !isEnc {
-		fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("3")).Render("! Your database is currently unencrypted. Run 'gauth passwd' to set a master password."))
+		fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("3")).Render("! Your database is currently unencrypted. Run 'gauth -p' to set a master password."))
 	}
 
 	if watchFlag {

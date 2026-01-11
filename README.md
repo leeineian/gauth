@@ -4,9 +4,12 @@ Fast, no-nonsense 2FA for your terminal, written in Go.
 
 ## tl;dr
 - `gauth`: Show codes (with color-coded countdowns)
-- `gauth entry add`: Interactive setup
-- `gauth passwd`: Manage master password (AES-256 encryption)
-- `gauth import/export`: andOTP backup support
+- `gauth -w`: Watch mode (auto-refresh)
+- `gauth -a`: Add new account
+- `gauth -d`: Delete account
+- `gauth -l`: List all accounts
+- `gauth -p`: Manage master password (AES-256 encryption)
+- `gauth -i/-e`: andOTP backup support
 - Saves to `$HOME/.gauth/gauth.json` (atomic writes)
 
 ## Installation
@@ -34,25 +37,36 @@ docker run -it -v ~/.gauth:/root/.gauth gauth
 **Viewing codes**
 ```bash
 ./gauth
-# build-in live mode (updates every second):
+# built-in live mode (updates every second):
 ./gauth -w
 ```
 
-**Adding accounts**
+**Managing Accounts**
 ```bash
-./gauth entry add
+# list all accounts
+./gauth -l
+```
+
+**Adding/Deleting accounts**
+```bash
+# Add
+./gauth -a
+
+# Delete
+./gauth -d
 ```
 
 **Importing/Exporting**
 ```bash
-./gauth import -f accounts.json -p <password>
-./gauth export -f backup.json -p <password>
+./gauth -i
+./gauth -e
 ```
 
 **Security**
 ```bash
 # set or change master password
-./gauth passwd
+# (leave empty to remove password)
+./gauth -p
 ```
 Once a password is set, your `gauth.json` is encrypted using AES-256-GCM.
 

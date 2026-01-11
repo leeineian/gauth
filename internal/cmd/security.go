@@ -61,7 +61,11 @@ var passwdCmd = &cobra.Command{
 		}
 
 		masterPassword = newPwd
-		fmt.Println("✓ Master password updated successfully!")
+		if newPwd == "" {
+			fmt.Println("✓ Master password removed. Database is now unencrypted.")
+		} else {
+			fmt.Println("✓ Master password updated successfully!")
+		}
 		return nil
 	},
 }

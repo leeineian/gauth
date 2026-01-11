@@ -183,11 +183,11 @@ func PromptNewPassword() (string, error) {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("New Master Password").
-				Description("This will be used to encrypt your secrets").
+				Description("Leave empty to remove password protection").
 				EchoMode(huh.EchoModePassword).
 				Value(&p1).
 				Validate(func(s string) error {
-					if len(s) < 8 {
+					if len(s) > 0 && len(s) < 8 {
 						return fmt.Errorf("password must be at least 8 characters")
 					}
 					return nil
