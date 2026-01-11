@@ -26,21 +26,17 @@ jobs:
       - name: Create Date Tag
         id: tag
         run: |
-          # Get latest tag (e.g. v1.0.0). If none, default to v0.0.0
-          LATEST=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          
-          # Use the latest tag as base, but append timestamp for unique pre-release (pseudo-ish)
-          # Note: v1.0.0-timestamp is LOWER than v1.0.0. 
-          # To ensure it increases, we typically need to increment patch, e.g. v1.0.1-timestamp
-          
-          # For now, let's keep it simple: Just use the timestamp as the build metadata or pre-release
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          
-          # Logic: If we are on main, we might want to just be "Latest Commit".
-          # But to supersede v1.0.0, we need v1.0.1-something.
-          
-          # Let's hardcode base to v1.0.1 for now since we are cleaning up v1.0.0
-          VERSION="v1.0.1-$TIMESTAMP"
+          # 1. Get Base Version
+          BASE_VERSION="v1.26.0"
+
+          # 2. Get Timestamp (YYYYMMDD) as requested
+          TIMESTAMP=$(date +%Y%m%d)
+
+          # 3. Get Commit Hash (12 chars)
+          COMMIT_HASH=$(git rev-parse --short=12 HEAD)
+
+          # 4. Construct Final Tag
+          VERSION="${BASE_VERSION}-${TIMESTAMP}-${COMMIT_HASH}"
           
           echo "Creating tag: $VERSION"
           

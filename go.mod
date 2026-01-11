@@ -2,13 +2,6 @@ module github.com/leeineian/gauth
 
 go 1.25.5
 
-retract (
-	v1.0.0
-	v1.0.0-20260111053730-17b2ef043a7e-20260111054308-91248b28ff77
-	v1.0.0-20260111-055456
-	v0.1.0-20260111051725-2b522b58b84d
-)
-
 require (
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/huh v0.8.0
