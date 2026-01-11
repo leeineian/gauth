@@ -1,0 +1,8 @@
+.git
+gauth
+gauth.json
+.gauth/
+export.json
+gauth_backup.json
+bin/
+obj/

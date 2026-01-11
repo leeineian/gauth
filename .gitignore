@@ -1,0 +1,17 @@
+# Binaries
+gauth
+gauth.exe
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Go
+vendor/
+*.test
+*.out
+
+# Local data (do not commit your secrets!)
+.gauth/
+export.json
+gauth_backup.json
